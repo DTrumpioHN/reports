@@ -1,0 +1,143 @@
+<18 Years old: this['age'] < 18
+If should ask ROI: this['consent-disclosure']
+Doesn't have Yearly review: !this['yearly-review']
+If should ask Privacy: this['privacy']=='yes'
+First visit: !this['link'].lastSession['welcome']
+First visit: !this['welcome']
+Male: ((this['gender'] || this['sex'] || '').toLowerCase() === 'male')
+Female: ((this['gender'] || this['sex'] || '').toLowerCase() === 'female')
+Female: (this['sex'] || '').toLowerCase() == 'female'
+Male: (this['sex'] || '').toLowerCase() == 'male'
+Any sex value except 'Male': ((this['sex'] || '').toLowerCase() == 'female' || (this['sex'] || '').toLowerCase() != 'male')
+Every 365 days: (( parseInt((this['appointment'] || '')) - parseInt((this['link'].lastSession['status-session']|| {})['questionnaireDate11MonthEpoch'] || '')) > 28944000000 )
+Every 365 days: (( parseInt((this['appointment'] || '')) - parseInt((this['link'].lastSession['status-session']|| {})['timeLogicRegistrationEpoch'] || '')) > 28944000000 )
+Calendar Year: !((this['link'].lastSession['status-session']|| {})['questionnaireDateCalendarYear'])
+Every 365 days: ( parseInt((this['appointment'] || '')) - parseInt((this['link'].lastSession['status-session']|| {})['questionnaireDateYearEpoch'] || '')) > 28944000000
+Every 365 days: !((this['link'].lastSession['status-session']|| {})['questionnaireDateYearEpoch'])
+Every 365 days: !((this['link'].lastSession['status-session']|| {})['questionnaireDateYearEpoch']) || (( parseInt((this['appointment'] || '')) - parseInt((this['link'].lastSession['status-session']|| {})['questionnaireDateYearEpoch'] || '')) > 31536000000 ) this condition is not on the tble filter because with the another condition related the every 365 is enough
+Every 365 days: ( !((this['link'].lastSession['status-session']|| {})['questionnaireDateYearEpoch']) || (( parseInt((this['appointment'] || '')) - parseInt((this['link'].lastSession['status-session']|| {})['questionnaireDateYearEpoch'] || '')) > 28944000000 ) )
+Every 365 days: ( !((this['link'].lastSession['status-session'] OR {})['questionnaireDateYearEpoch']) OR (( parseInt((this['appointment'] OR '')) - parseInt((this['link'].lastSession['status-session'] OR {})['questionnaireDateYearEpoch'] OR '')) > 28944000000 ) )
+New: this['shouldAskNew'] === true
+New: this['shouldAskNew']
+New visit: (this['visit-type-1'] || '').toLowerCase().indexOf('new') > -1
+Follow Up visit: (this['visit-type-1'] || '').toLowerCase().indexOf('existing') > -1
+Follow Up: this['shouldAskFollowUp'] === true
+Follow Up: this['shouldAskFollowUp']
+Follow Up BH: this['shouldAskFollowUpBH'] === true
+4 to 10 Years old: this['age'] ?( this['age'] >= 4 && this['age'] <= 10) : false
+1+: this['age'] == 1
+1 to 17 Years old: this['age'] >= 1 && this['age'] <= 17
+8+ years old: (this['age'] ?( this['age'] >= 8 && this['age'] <= 1000) : false)
+10+ years old: (this['age'] ?( this['age'] >= 10 && this['age'] <= 1000) : false)
+12+: this['age'] >= 12
+12+: (this['age'] ?( this['age'] >= 12 && this['age'] <= 1000) : false) this condition share the original condition, for this reason not is filtered on the table, but this condition is enough this['age'] >= 12
+12 to 17 Years old: (this['age'] ? (this['age'] >= 12 && this['age'] <= 17) : false)
+12 to 54 Years old: this['age'] >= 12 && this['age'] <=54
+15+ years old: (this['age'] ?( this['age'] >= 15) : true)
+15+ years old: this['age'] >= 15
+16+ years old: this['age'] >= 16
+18+ years old: (this['age'] ?( this['age'] >= 18 && this['age'] <= 1000) : false)  this condition share the original condition, for this reason not is filtered on the table, but this condition is enough this['age'] >= 18
+18+ years old: this['age'] >= 18
+21+ years old: this['age'] >= 21
+25+ years old: this['age'] >= 25
+45+ years old: this['age'] >= 45
+50+ years old: this['age'] >= 50
+Gyn Annual: this['shouldAskGynAnnual'] === true
+If triggered positively for illicit drug use: this['illicitdrug-yesno'] > 0
+Show UCCP information: this['shouldAskUCCP']\n
+If should ask Payson: this['shouldAskPayson']
+If should ask sick: this['shouldAskSick'] === true
+If should ask prenatal: this['shouldAskPrenatal']
+If should not ask prenatal: !this['shouldAskPrenatal']
+If should ask Wellness: this['shouldAskWellness']
+If should not ask Wellness: !this['shouldAskWellness']
+If should ask personal Info: this['askPersonalInfo'] == 'yes'
+If should ask Medication: this['askMedication'] == 'yes'
+If should ask Chronic-illnesses: this['askChronicIllness'] == 'yes'
+New OR Follow Up OR If should ask Wellness: (shouldAskNew === true || shouldAskFollowUp || shouldAskWellness === true)
+If should ask Social history: this['askSocialHistory'] == 'yes'
+If should ask Family history: this['askFamilyHistory'] == 'yes'
+If should ask Medicare: this['askMedicare']=='yes'
+If should not ask Medicare: !this['askMedicare']=='yes'
+If should ask ROS: this['askROS'] == 'yes'
+If should ask ROS: this['transition-ros']
+If should ask demographics: this['askDemographics'] == 'yes'
+If should ask UCCP: this['shouldAskUCCP']
+If should not ask UCCP: !this['shouldAskUCCP']
+The responsible is 'Insurance': (this['responsible-who'] || '').toLowerCase()==='other'
+The responsible is 'Insurance': ((this['responsible-who'] || '').toLowerCase() === 'insurance'
+Doesn't have a policy or no longer has a policy: (this['insurance-policy-yesno'] || '').trim().toLowerCase() == 'no' || (this['insurance-still-having-policy'] || '').trim().toLowerCase() == 'no')
+New, If should ask Wellness: (this['shouldAskNew'] || this['shouldAskWellness'])
+If should ask telehealth: this['shouldAskTelehealth']
+If should ask signature: this['askSignature']=='yes'
+If contain Asthma on the medical history: (this['medical-history-chronic-illnesses'] || '').toLowerCase().indexOf('asthma') > -1
+If should ask HPI: this['askHPI']=='yes'
+If should ask HPI: this ['askHPI'] == 'yes'
+If should ask contact information: (this['transition-contact'] || '').toLowerCase().indexOf('next') > -1
+If should not ask Medicare:	(this['askMedicare']=='no' || !this['askMedicare'])
+If should ask Insurance: this['askInsurance'] == 'yes'
+If should ask not Limited: !this['shouldAskLimited']
+If should not ask registration ot limited: !(this['shouldAskRegistration'] || this['shouldAskLimited'])
+5+ Years old: (this['age'] ?( this['age'] >= 5 && this['age'] <= 1000) : false)
+3+ Years old: (this['age'] ?( this['age'] >= 03 && this['age'] <= 1000) : false)
+1+ Years old: (this['age'] ?( this['age'] >= 1 && this['age'] <= 1000) : false)
+<1 years old: this['age'] <= 1
+<2 years old: this['age'] < 2
+>9 years old: this['age'] >= 9
+>11 years old: this['age'] >= 11
+>11 years old: this['age'] > 11
+<18 Years old: this['age'] < 18
+<18 Years old: this['age'] <= 18
+<17 years old: this['age'] <= 17
+<17 years old: this['age'] < 17
+>65 years old: this['age'] >= 65
+If should ask ROI: this['consent-disclosure']
+Doesn't have Yearly review: !this['yearly-review']
+If should ask School Based : this['shouldAskSchoolBased']
+If should ask BH: this['shouldAskBH']
+If should ask Wellness: this['shouldAskWellness']===true
+If chatbot mode is not kiosk: this['CHATBOT_MODE'] != 'kiosk'
+If is an Emergency: (this['emergency-yesno'] || '') == 'Emergency'
+Doesn't have gender: !this['link'].lastSession['gender']
+Doesn't have gender: !this['gender']
+Doesn't have referral Source: !this['link'].lastSession['referral-source']
+If should ask Well Child: this['shouldAskWellChild']
+If should ask Medicare: this['shouldAskMedicare']
+If should not ask Medicare: !this['shouldAskMedicare']
+If should ask same day: this['shouldAskSameDay']
+9-11 months old: (this['age-under2'] || '').toLowerCase().indexOf('9-11 months') > -1
+newborn: (this['age-under2'] || '').toLowerCase().indexOf('newborn') > -1
+1 month old: (this['age-under2'] || '').toLowerCase().indexOf('1 month') > -1
+2-3 months old: (this['age-under2'] || '').toLowerCase().indexOf('2-3 months') > -1
+4-5 months old: (this['age-under2'] || '').toLowerCase().indexOf('4-5 months') > -1
+6 months old: (this['age-under2'] || '').toLowerCase().indexOf('6 months') > -1
+15-17 months old: (this['age-under2'] || '').toLowerCase().indexOf('15-17 months') > -1
+17 months old: (this['age-15-17mo'] || '').toLowerCase().indexOf('17 months') > -1
+18-21 months old: (this['age-under2'] || '').toLowerCase().indexOf('18-21 months') > -1
+22-23 months old: (this['age-under2'] || '').toLowerCase().indexOf('22-23 months') > -1
+24 months old: (this['age-under2'] || '').toLowerCase().indexOf('24 months') > -1
+2 years old: (this['age-under3'] || '').toLowerCase().indexOf('2 years') > -1
+12-14 months old: (this['age-under2'] || '').toLowerCase().indexOf('12-14 months') > -1
+3 years old: (this['age-under3'] || '').toLowerCase().indexOf('3 years') > -1
+3 years old: this['age'] == 3
+4 years old: this['age'] == 4
+4-11 years old: this['age'] >= 4 AND this['age'] <= 11
+7-8 months old: (this['age-under2'] || '').toLowerCase().indexOf('7-8 months') > -1
+>1 years old: this['age'] >= 1
+<5 years old: this['age'] <= 5
+>3 years old: this['age'] >= 3
+<11 years old: this['age'] <= 11
+present anxiety: (this['visit-reason-bh'] || '').toLowerCase().indexOf('anxiety') > -1
+present depression: (this['visit-reason-bh'] || '').toLowerCase().indexOf('depression') > -1
+> 6 years old: this['age'] >= 6
+> 4 years old: this['age'] >= 4
+If should ask Past Surgery: this['askPastSurgery'] == 'yes'
+conservatorship is guardian: (this['conservatorship'] || '').toLowerCase().indexOf('guardian') > -1
+conservatorship is guarantor: (this['conservatorship'] || '').toLowerCase().indexOf('guarantor') > -1
+Doesn't have responsible relationship: !this['responsible-party-relationship']
+Does have recent contact with covid19: if((this['sh-recent-contact-covid-19'] || '').toLowerCase() == 'yes')
+If is an Emergency: (this['privacy-add'] || '') == 'Emergency'
+New: this['shouldAskNew']===true
+If haven't prior experience ADHD: (this['adhd-before-yesno'] OR '').toLowerCase().indexOf('no') > -1
+If is a current smoker: (this['smoke-status'] OR '').toLowerCase().indexOf('current') > -1: (this['smoke-status'] OR '').toLowerCase().indexOf('current') > -1
+Every 365: ( parseInt((this['appointment'] OR '')) - parseInt((this['link'].lastSession['status-session'] OR {})['questionnaireDateYearEpoch'] OR '')) > 31536000000

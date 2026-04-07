@@ -1,0 +1,11 @@
+{
+  "name": "reports",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "parse:conditions": "tsx scripts/questionnaire-conditions/parse-conditions.mts scripts/questionnaire-conditions/preguntas-section-input.json"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.6"
+  }
+}

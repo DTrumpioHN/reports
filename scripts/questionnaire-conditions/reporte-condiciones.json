@@ -1,0 +1,212 @@
+[
+  {
+    "section": "Introduction",
+    "question": "<%provider%> would like to get to know <%person%> before your visit.",
+    "conditions": "Always On"
+  },
+  {
+    "section": "Disclaimer",
+    "question": "If you are having an EMERGENCY, stop now and call:<a href='tel:911'>911</a>",
+    "conditions": "If is an Emergency"
+  },
+  {
+    "section": "COVID",
+    "question": "<%HavHas%> <%person%> been to an area known to be high risk for coronavirus (COVID-19)?",
+    "conditions": "false: not working"
+  },
+  {
+    "section": "Authorized Party",
+    "question": "I am filling out this paperwork for my:",
+    "conditions": "Always On"
+  },
+  {
+    "section": "Security Verification",
+    "question": "Please confirm <%person-possessive%> date of birth.",
+    "conditions": "Always On"
+  },
+  {
+    "section": "Gender Identity",
+    "question": "What is <%person-possessive%> gender?",
+    "conditions": "If should ask personal Info AND Doesn't have gender"
+  },
+  {
+    "section": "HPI - BH",
+    "question": "Let's now discuss the reason for <%person-possessive%> upcoming appointment.",
+    "conditions": "If should ask BH"
+  },
+  {
+    "section": "HPI - Wellness",
+    "question": "Let's now discuss the reason for <%person-possessive%> upcoming appointment.",
+    "conditions": "If should ask Wellness AND <2 years old"
+  },
+  {
+    "section": "HPI - Medical",
+    "question": "What is the main reason for <%person-possessive%> upcoming visit?",
+    "conditions": "If should ask HPI AND New AND If should not ask Wellness OR Follow Up OR If should ask same day"
+  },
+  {
+    "section": "Screener - ASQ",
+    "question": "We are now going to ask you some questions about your child's development.",
+    "conditions": "If should ask HPI AND 9-11 months old"
+  },
+  {
+    "section": "Screener - EPDS",
+    "question": "product-epds-v2",
+    "conditions": "If should ask personal Info AND newborn OR 1 month old OR 2-3 months old OR 4-5 months old OR 6 months old"
+  },
+  {
+    "section": "Screener - MCHAT",
+    "question": "product-mchatr-v2",
+    "conditions": "If should ask HPI AND 15-17 months old AND 17 months old OR 18-21 months old OR 22-23 months old OR 24 months old OR 2 years old"
+  },
+  {
+    "section": "Screener - PEDS Response",
+    "question": "Do you have any concerns about how your child talks and makes speech sounds?",
+    "conditions": "If should ask HPI AND If should ask Wellness AND 12-14 months old OR 3 years old OR 4 years old"
+  },
+  {
+    "section": "Screener - PSC17",
+    "question": "product-psc-17",
+    "conditions": "If should ask HPI AND If should ask Wellness AND > 4 years old AND <11 years old"
+  },
+  {
+    "section": "Screener - PHQ",
+    "question": "product-phq2-9",
+    "conditions": "If should ask HPI AND If should ask Wellness OR New AND 18+ years old"
+  },
+  {
+    "section": "Screener - CRAFFT",
+    "question": "product-crafft2-1-n-v2",
+    "conditions": "If should ask HPI AND If should ask Wellness OR New AND >11 years old AND <17 years old"
+  },
+  {
+    "section": "Screener - HVS",
+    "question": "product-hvs",
+    "conditions": "If should ask HPI AND If should ask Wellness"
+  },
+  {
+    "section": "Screener - Lead",
+    "question": "The following questions will help determine if your child has been exposed to lead.",
+    "conditions": "If should ask HPI AND If should ask Wellness AND 6 months old OR 7-8 months old OR 9-11 months old OR 12-14 months old OR >1 years old AND <5 years old"
+  },
+  {
+    "section": "Screener - PEARL",
+    "question": "The next few questions will ask about your child's life experiences.",
+    "conditions": "If should ask HPI AND >3 years old AND <11 years old AND If haven't prior experience ADHD OR present anxiety OR present depression"
+  },
+  {
+    "section": "Screener - KADS",
+    "question": "Please answer the following questions about <%person-possessive%> mood.",
+    "conditions": "If should ask HPI AND 12+ AND <18 Years old AND present anxiety OR present depression"
+  },
+  {
+    "section": "Screener - BECKS",
+    "question": "Please answer the following questions about <%person-possessive%> mood.",
+    "conditions": "If should ask HPI AND 18+ years old AND present anxiety OR present depression"
+  },
+  {
+    "section": "Screener - SCARED",
+    "question": "product-scared-caregiver",
+    "conditions": "If should ask HPI AND > 6 years old AND <17 years old AND present anxiety OR present depression"
+  },
+  {
+    "section": "Screener - Vanderbilt",
+    "question": "product-vanderbilt-parent-initial",
+    "conditions": "If should ask HPI AND > 4 years old AND If haven't prior experience ADHD"
+  },
+  {
+    "section": "Medication",
+    "question": "Let's discuss <%person-possessive%> Medical History.",
+    "conditions": "If should ask personal Info AND If should ask not Limited"
+  },
+  {
+    "section": "Allergies",
+    "question": "",
+    "conditions": "If should ask not Limited"
+  },
+  {
+    "section": "Past Medical History",
+    "question": "Since <%person-possessive%> last visit, <%havhas%> <%person%> been diagnosed with any new medical conditions?",
+    "conditions": "If should ask Chronic-illnesses AND If should ask not Limited AND If should ask Wellness"
+  },
+  {
+    "section": "Past Surgical",
+    "question": "Since <%person-possessive%> last visit, <%havhas%> <%person%> had any new surgeries or procedures?",
+    "conditions": "If should ask Past Surgery AND If should ask not Limited AND If should ask Wellness"
+  },
+  {
+    "section": "Social History",
+    "question": "Now we will ask you a few questions about your life in general.",
+    "conditions": "false: not working"
+  },
+  {
+    "section": "Family History",
+    "question": "Since <%person-possessive%> last visit, have any of <%person-possessive%> family members been diagnosed with any new medical conditions?",
+    "conditions": "If should ask Family history AND If should ask not Limited AND If should ask Wellness"
+  },
+  {
+    "section": "Review of Systems (ROS)",
+    "question": "<%IsAre%> <%person%> having any of these general symptoms:",
+    "conditions": "If should ask ROS"
+  },
+  {
+    "section": "Vaccine",
+    "question": "<%HavHas%> <%person%> had a flu shot this flu season?",
+    "conditions": "false: not working"
+  },
+  {
+    "section": "Drivers License",
+    "question": "Let's discuss <%person-possessive%> Demographic Information.",
+    "conditions": "If should ask demographics AND New"
+  },
+  {
+    "section": "Demographics",
+    "question": "What best describes <%person-possessive%> race?",
+    "conditions": "If should ask demographics AND New"
+  },
+  {
+    "section": "Contact Information",
+    "question": "Now, let's review <%person-possessive%> <u>contact information</u>.",
+    "conditions": "If should ask not Limited"
+  },
+  {
+    "section": "Pharmacy",
+    "question": "",
+    "conditions": "If should ask personal Info AND If should ask not Limited"
+  },
+  {
+    "section": "Guardian",
+    "question": "What is <%person-possessive%> guardian's first and last name?",
+    "conditions": "If should ask demographics AND conservatorship is guardian"
+  },
+  {
+    "section": "Guarantor",
+    "question": "What is <%person-possessive%> guarantor's first and last name?",
+    "conditions": "If should ask demographics AND conservatorship is guarantor"
+  },
+  {
+    "section": "Insurance",
+    "question": "We noticed you selected 'other'. Who will be responsible for paying for this visit?",
+    "conditions": "The responsible is 'Insurance' AND Doesn't have responsible relationship"
+  },
+  {
+    "section": "Release of Information",
+    "question": "The next few questions will ask if <%person%> would like to allow <%person-possessive%> protected health information (PHI) to be given or shared to family or friends involved with <%person-possessive%> care.",
+    "conditions": "New OR Every 365 days OR Every 365"
+  },
+  {
+    "section": "Referral Source",
+    "question": "How did <%person%> hear about our office?",
+    "conditions": "If should ask demographics AND If should ask not Limited"
+  },
+  {
+    "section": "Office Administrative Policy",
+    "question": "Please read our policies carefully",
+    "conditions": "Always On"
+  },
+  {
+    "section": "Signature",
+    "question": "By signing below,",
+    "conditions": "Always On"
+  }
+]

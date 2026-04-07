@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Condition Parser</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap');
+
+        :root {
+            --bg: #0d0d0f;
+            --surface: #16161a;
+            --surface2: #1e1e24;
+            --border: #2a2a35;
+            --accent: #7c6af7;
+            --accent2: #4ecdc4;
+            --danger: #ff6b6b;
+            --warn: #ffd166;
+            --text: #e8e8f0;
+            --text-dim: #7a7a8c;
+            --text-muted: #44444f;
+            --mono: 'JetBrains Mono', monospace;
+            --sans: 'Syne', sans-serif;
+            --radius: 10px;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--sans);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* HEADER */
+        header {
+            border-bottom: 1px solid var(--border);
+            padding: 1.5rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: var(--surface);
+        }
+
+        .logo-icon {
+            width: 38px;
+            height: 38px;
+            background: var(--accent);
+            border-radius: 8px;
+            display: grid;
+            place-items: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        header h1 {
+            font-size: 1.2rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        header p {
+            font-size: 0.78rem;
+            color: var(--text-dim);
+            font-family: var(--mono);
+        }
+
+        /* MAIN LAYOUT */
+        main {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* CARD */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: var(--surface2);
+        }
+
+        .card-header .step {
+            width: 22px;
+            height: 22px;
+            background: var(--accent);
+            border-radius: 50%;
+            font-size: 0.7rem;
+            font-weight: 700;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            font-family: var(--mono);
+        }
+
+        .card-header h2 {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 1.25rem;
+        }
+
+        /* DROP ZONE */
+        .drop-zone {
+            border: 1.5px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .drop-zone:hover,
+        .drop-zone.dragover {
+            border-color: var(--accent);
+            background: rgba(124, 106, 247, 0.06);
+        }
+
+        .drop-zone input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+
+        .drop-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .drop-label {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+
+        .drop-label strong {
+            color: var(--accent);
+        }
+
+        .file-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(78, 205, 196, 0.12);
+            border: 1px solid rgba(78, 205, 196, 0.3);
+            color: var(--accent2);
+            border-radius: 6px;
+            padding: 0.3rem 0.7rem;
+            font-size: 0.78rem;
+            font-family: var(--mono);
+            margin-top: 0.5rem;
+        }
+
+        /* TEXTAREA */
+        textarea {
+            width: 100%;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            padding: 0.8rem;
+            resize: vertical;
+            min-height: 180px;
+            line-height: 1.5;
+            transition: border-color 0.2s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .textarea-hint {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            font-family: var(--mono);
+            margin-top: 0.4rem;
+        }
+
+        /* BUTTON */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.7rem 1.4rem;
+            border-radius: 8px;
+            font-family: var(--sans);
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.18s;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 0 0 0 rgba(124, 106, 247, 0.5);
+        }
+
+        .btn-primary:hover {
+            background: #6a59e0;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(124, 106, 247, 0.35);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--accent2);
+            color: var(--accent2);
+        }
+
+        .btn-sm {
+            padding: 0.45rem 0.9rem;
+            font-size: 0.8rem;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        /* STATUS */
+        .status-bar {
+            display: none;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-family: var(--mono);
+        }
+
+        .status-bar.show {
+            display: flex;
+        }
+
+        .status-bar.info {
+            background: rgba(124, 106, 247, 0.1);
+            border: 1px solid rgba(124, 106, 247, 0.25);
+            color: var(--accent);
+        }
+
+        .status-bar.success {
+            background: rgba(78, 205, 196, 0.1);
+            border: 1px solid rgba(78, 205, 196, 0.25);
+            color: var(--accent2);
+        }
+
+        .status-bar.error {
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.25);
+            color: var(--danger);
+        }
+
+        .status-bar.warn {
+            background: rgba(255, 209, 102, 0.1);
+            border: 1px solid rgba(255, 209, 102, 0.25);
+            color: var(--warn);
+        }
+
+        /* RESULTS TABLE */
+        .results-wrap {
+            overflow-x: auto;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+
+        th {
+            background: var(--surface2);
+            padding: 0.6rem 0.9rem;
+            text-align: left;
+            font-family: var(--mono);
+            font-size: 0.72rem;
+            color: var(--text-dim);
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 0.55rem 0.9rem;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+            line-height: 1.5;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        td:first-child {
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            color: var(--accent2);
+            white-space: nowrap;
+        }
+
+        td:nth-child(2) {
+            color: var(--text-dim);
+            max-width: 300px;
+        }
+
+        td:nth-child(3) {
+            font-family: var(--mono);
+            font-size: 0.75rem;
+        }
+
+        .badge-always {
+            color: var(--accent2);
+        }
+
+        .badge-false {
+            color: var(--danger);
+        }
+
+        /* STATS ROW */
+        .stats-row {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.65rem 1rem;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--accent);
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.72rem;
+            color: var(--text-dim);
+            font-family: var(--mono);
+            margin-top: 0.2rem;
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* NEW CONDITIONS */
+        .new-cond-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+
+        .new-cond-tag {
+            background: rgba(255, 209, 102, 0.08);
+            border: 1px solid rgba(255, 209, 102, 0.2);
+            color: var(--warn);
+            border-radius: 5px;
+            padding: 0.25rem 0.55rem;
+            font-size: 0.72rem;
+            font-family: var(--mono);
+        }
+
+        /* SPINNER */
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .spinner {
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(124, 106, 247, 0.3);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            flex-shrink: 0;
+        }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="logo-icon">⚙</div>
+        <div>
+            <h1>Condition Parser</h1>
+            <p>questionnaire-conditions · parse &amp; export</p>
+        </div>
+    </header>
+
+    <main>
+
+        <!-- STEP 1: Questions file -->
+        <div class="card">
+            <div class="card-header">
+                <span class="step">1</span>
+                <h2>Questions file <span style="color:var(--text-dim);font-weight:400">(JSON or TSV)</span></h2>
+            </div>
+            <div class="card-body">
+                <div class="drop-zone" id="dropZoneQ">
+                    <input type="file" id="fileQ" accept=".json,.tsv,.txt" />
+                    <div class="drop-icon">📄</div>
+                    <div class="drop-label">Drop your <strong>preguntas.json</strong> or <strong>.tsv</strong> here, or
+                        click to browse</div>
+                    <div id="fileQBadge"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 2: Conditions map -->
+        <div class="card">
+            <div class="card-header">
+                <span class="step">2</span>
+                <h2>Logical conditions map <span
+                        style="color:var(--text-dim);font-weight:400">(condiciones-logicas.tsv)</span></h2>
+            </div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:0.75rem;">
+                <div class="drop-zone" id="dropZoneC">
+                    <input type="file" id="fileC" accept=".tsv,.txt" />
+                    <div class="drop-icon">🗂</div>
+                    <div class="drop-label">Drop your <strong>condiciones-logicas.tsv</strong> here, or click to browse
+                    </div>
+                    <div id="fileCBadge"></div>
+                </div>
+                <div class="divider"></div>
+                <div style="font-size:0.78rem;color:var(--text-dim);font-family:var(--mono);margin-bottom:0.3rem;">
+                    — or paste / edit directly —
+                </div>
+                <textarea id="condText"
+                    placeholder="Description: condition.&#10;If should ask HPI: this['askHPI']=='yes'.&#10;..."></textarea>
+                <p class="textarea-hint">Format per line: <code>Description: raw condition.</code></p>
+            </div>
+        </div>
+
+        <!-- STEP 3: Run -->
+        <div class="card">
+            <div class="card-header">
+                <span class="step">3</span>
+                <h2>Process &amp; Export</h2>
+            </div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:1rem;">
+                <div class="btn-row">
+                    <button class="btn btn-primary" id="btnRun" disabled>
+                        <span>▶</span> Run parser
+                    </button>
+                </div>
+                <div class="status-bar" id="statusBar"></div>
+            </div>
+        </div>
+
+        <!-- RESULTS -->
+        <div id="resultsSection" style="display:none;flex-direction:column;gap:1.5rem;">
+
+            <div class="stats-row" id="statsRow"></div>
+
+            <!-- New conditions warning -->
+            <div id="newCondCard" class="card" style="display:none;">
+                <div class="card-header">
+                    <span style="font-size:1rem;">⚠️</span>
+                    <h2 style="color:var(--warn);">Unrecognized conditions</h2>
+                </div>
+                <div class="card-body">
+                    <p style="font-size:0.8rem;color:var(--text-dim);margin-bottom:0.75rem;">These conditions weren't
+                        found in the map and were left as-is. Add them to your TSV for future runs.</p>
+                    <div class="new-cond-list" id="newCondList"></div>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="card">
+                <div class="card-header" style="justify-content:space-between;">
+                    <div style="display:flex;align-items:center;gap:0.6rem;">
+                        <span style="font-size:1rem;">📋</span>
+                        <h2>Report</h2>
+                    </div>
+                    <div class="btn-row">
+                        <button class="btn btn-outline btn-sm" id="btnDlJSON">⬇ JSON</button>
+                        <button class="btn btn-outline btn-sm" id="btnDlXLSX">⬇ Excel</button>
+                    </div>
+                </div>
+                <div class="card-body" style="padding:0;">
+                    <div class="results-wrap">
+                        <table id="resultsTable">
+                            <thead>
+                                <tr>
+                                    <th>Section</th>
+                                    <th>Question</th>
+                                    <th>Conditions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resultsBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <script>
+        // ─────────────────────────────────────────────
+        // PORTED LOGIC from parse-conditions.mts
+        // ─────────────────────────────────────────────
+
+        const ALWAYS_ON = "Always On";
+        const FALSE_NOT_WORKING = "false: not working";
+        const SECTION_SKIP = "Time Logic";
+
+        function stripOuterParens(s) {
+            let t = s.trim();
+            while (t.startsWith("(") && t.endsWith(")")) {
+                let depth = 0, match = false;
+                for (let i = 0; i < t.length; i++) {
+                    if (t[i] === "(") depth++;
+                    else if (t[i] === ")") {
+                        depth--;
+                        if (depth === 0) { match = i === t.length - 1; break; }
+                    }
+                }
+                if (!match) break;
+                t = t.slice(1, -1).trim();
+            }
+            return t;
+        }
+
+        function normalizeCondition(c) {
+            let out = c.trim()
+                .replace(/\s+/g, " ")
+                .replace(/\s*&&\s*/g, " AND ")
+                .replace(/\s*\|\|\s*/g, " OR ")
+                .replace(/\s*==\s*/, "==")
+                .replace(/\s*!=\s*/, "!=")
+                .replace(/\s*<\s*/, " < ")
+                .replace(/\s*>\s*/, " > ");
+            return stripOuterParens(out);
+        }
+
+        function stripLineComments(raw) {
+            return raw.split(/\r?\n/).map(l => l.replace(/\/\/.*$/, "")).join("\n").trim();
+        }
+
+        function sanitizeConditionRaw(raw) {
+            const noComments = stripLineComments(raw);
+            if (!noComments) return "";
+            return noComments.split(/\r?\n/)
+                .map(l => l.trim()).filter(Boolean)
+                .filter(line => {
+                    if (/^(if|else|return|let|const|var)\b/i.test(line)) return false;
+                    if (/^[{}]+$/.test(line)) return false;
+                    if (/^result\s*=/.test(line)) return false;
+                    if (/^result\s*===?/.test(line)) return false;
+                    return true;
+                }).join(" ").trim();
+        }
+
+        function splitAtTopLevel(raw) {
+            const s = stripOuterParens(raw);
+            if (!s) return [];
+            let depth = 0;
+            const positions = [];
+            for (let i = 0; i < s.length; i++) {
+                if (s[i] === "(") { depth++; continue; }
+                if (s[i] === ")") { depth--; continue; }
+                if (depth !== 0) continue;
+                if (s.slice(i, i + 2) === "&&") { positions.push({ index: i, length: 2, op: "AND" }); i++; continue; }
+                if (s.slice(i, i + 2) === "||") { positions.push({ index: i, length: 2, op: "OR" }); i++; continue; }
+            }
+            if (positions.length === 0) return [{ type: "condition", raw: s, label: "" }];
+            const result = [];
+            let start = 0;
+            for (const pos of positions) {
+                const seg = s.slice(start, pos.index).trim();
+                if (seg) result.push(...splitAtTopLevel(seg));
+                result.push({ type: "op", value: pos.op });
+                start = pos.index + pos.length;
+            }
+            const tail = s.slice(start).trim();
+            if (tail) result.push(...splitAtTopLevel(tail));
+            return result;
+        }
+
+        function parseConditionParts(condition) {
+            const raw = sanitizeConditionRaw(condition ?? "");
+            if (!raw) return [];
+            return splitAtTopLevel(raw);
+        }
+
+        function shouldDropCondition(raw) {
+            const normalized = normalizeCondition(raw);
+            const bare = normalized.replace(/^\(+/, "").replace(/\)+$/, "");
+            if (bare === "!this['_isInCorrectNameOrBirthday']") return true;
+            if (bare === "this['_isInCorrectNameOrBirthday']") return true;
+            if (bare === "!this['birthday']") return true;
+            if (bare === "!this['birthday'] OR this['_isInCorrectNameOrBirthday']") return true;
+            if (/^this\['privacy'\]={2,3}['"]yes['"]$/i.test(bare)) return true;
+            if (bare.includes("this['logic")) return true;
+            if (/\bresult\b/.test(bare)) return true;
+            if (/^(if|else|return)\b/i.test(bare)) return true;
+            if (/indexOf\(.*\)==-1$/.test(bare)) return true;
+            return false;
+        }
+
+        function filterConditionParts(parts) {
+            const result = [];
+            let pendingOp = null;
+            for (const p of parts) {
+                if (p.type === "op") { pendingOp = p; continue; }
+                if (shouldDropCondition(p.raw)) { continue; }
+                if (result.length > 0 && pendingOp) result.push(pendingOp);
+                result.push(p);
+                pendingOp = null;
+            }
+            return result;
+        }
+
+        function resolveLabels(parts, condMap, newConditions) {
+            for (const p of parts) {
+                if (p.type === "condition") {
+                    const key = normalizeCondition(p.raw);
+                    const label = condMap.get(key);
+                    if (label !== undefined) { p.label = label; }
+                    else { p.label = normalizeCondition(p.raw); newConditions.add(p.label); }
+                }
+            }
+        }
+
+        function findLastLabel(tokens) {
+            for (let i = tokens.length - 1; i >= 0; i--) {
+                if (tokens[i] !== "AND" && tokens[i] !== "OR") return tokens[i];
+            }
+            return null;
+        }
+
+        function conditionColumn(parts) {
+            if (parts.length === 0) return ALWAYS_ON;
+            const tokens = parts.map(p => p.type === "op" ? p.value : p.label || p.raw).filter(Boolean);
+            const deduped = [];
+            for (let i = 0; i < tokens.length; i++) {
+                const t = tokens[i];
+                const isOp = t === "AND" || t === "OR";
+                if (isOp) { deduped.push(t); }
+                else {
+                    const lastLabel = deduped.length > 0 ? findLastLabel(deduped) : null;
+                    if (lastLabel === t) {
+                        if (deduped.at(-1) === "AND" || deduped.at(-1) === "OR") deduped.pop();
+                    } else { deduped.push(t); }
+                }
+            }
+            return deduped.join(" ").trim() || ALWAYS_ON;
+        }
+
+        function isFalseGateCondition(raw) {
+            const cleaned = sanitizeConditionRaw(raw ?? "");
+            return /^\(*\s*false\s*\)*(\s*&{1,2}|\s*$)/i.test(cleaned);
+        }
+
+        function loadCondicionesLogicas(text) {
+            const map = new Map();
+            for (const line of text.split(/\r?\n/).filter(l => l.trim())) {
+                const colonIndex = line.indexOf(": ");
+                if (colonIndex === -1) continue;
+                const desc = line.slice(0, colonIndex).trim();
+                let cond = line.slice(colonIndex + 2).trim();
+                if (cond.endsWith(".")) cond = cond.slice(0, -1).trim();
+                if (cond) map.set(normalizeCondition(cond), desc);
+            }
+            return map;
+        }
+
+        function loadQuestions(content, filename) {
+            if (filename.endsWith(".tsv") || content.startsWith("answer\t") || !content.trimStart().startsWith("[")) {
+                const lines = content.split(/\r?\n/);
+                const header = (lines[0] ?? "").split("\t").map(h => h.trim().toLowerCase());
+                const questionIdx = header.indexOf("question");
+                const sectionIdx = header.indexOf("section");
+                const conditionIdx = header.indexOf("condition");
+                const rows = [];
+                for (let i = 1; i < lines.length; i++) {
+                    const cols = lines[i].split("\t");
+                    rows.push({
+                        section: sectionIdx >= 0 ? (cols[sectionIdx] ?? "").trim() : "",
+                        question: questionIdx >= 0 ? (cols[questionIdx] ?? "").trim() : "",
+                        condition: conditionIdx >= 0 ? (cols[conditionIdx] ?? "").trim() : "",
+                    });
+                }
+                return rows;
+            }
+            const data = JSON.parse(content);
+            return Array.isArray(data) ? data : [data];
+        }
+
+        function runParser(questionsText, questionsFilename, condText) {
+            const condMap = loadCondicionesLogicas(condText);
+            const questions = loadQuestions(questionsText, questionsFilename);
+            const newConditions = new Set();
+
+            const sectionOrder = [];
+            const bySection = new Map();
+            for (const q of questions) {
+                const section = (q.section ?? "").trim();
+                if (section === SECTION_SKIP) continue;
+                if (!bySection.has(section)) sectionOrder.push(section);
+                const list = bySection.get(section) ?? [];
+                list.push(q);
+                bySection.set(section, list);
+            }
+
+            const rows = [];
+            for (const section of sectionOrder) {
+                if (!section) continue;
+                const sectionQuestions = bySection.get(section) ?? [];
+                let chosenQuestion, chosenConditions = ALWAYS_ON;
+                let fallbackQuestion, fallbackConditions = ALWAYS_ON;
+                let hasNonFalse = false;
+
+                for (const q of sectionQuestions) {
+                    const conditionRaw = (q.condition ?? "").trim();
+                    if (isFalseGateCondition(conditionRaw)) continue;
+                    hasNonFalse = true;
+                    const parts = filterConditionParts(parseConditionParts(conditionRaw));
+                    resolveLabels(parts, condMap, newConditions);
+                    const currentConditions = conditionColumn(parts);
+                    if (!fallbackQuestion) { fallbackQuestion = q; fallbackConditions = currentConditions; }
+                    if (currentConditions !== ALWAYS_ON) { chosenQuestion = q; chosenConditions = currentConditions; break; }
+                }
+
+                const question = chosenQuestion ?? fallbackQuestion ?? sectionQuestions[0];
+                const questionText = (question?.question ?? "").trim();
+                const conditions = hasNonFalse
+                    ? (chosenQuestion ? chosenConditions : fallbackConditions)
+                    : FALSE_NOT_WORKING;
+                rows.push({ section, question: questionText, conditions });
+            }
+
+            return { rows, newConditions: [...newConditions] };
+        }
+
+        // ─────────────────────────────────────────────
+        // UI
+        // ─────────────────────────────────────────────
+
+        let questionsText = null;
+        let questionsFilename = "questions.json";
+
+        function setStatus(msg, type = "info", spin = false) {
+            const bar = document.getElementById("statusBar");
+            bar.className = `status-bar show ${type}`;
+            bar.innerHTML = (spin ? `<div class="spinner"></div>` : "") + `<span>${msg}</span>`;
+        }
+
+        function setupDrop(dropId, inputId, badgeId, onLoad) {
+            const zone = document.getElementById(dropId);
+            const input = document.getElementById(inputId);
+            const badge = document.getElementById(badgeId);
+
+            const readFile = file => {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    badge.innerHTML = `<span class="file-badge">✓ ${file.name}</span>`;
+                    onLoad(e.target.result, file.name);
+                };
+                reader.readAsText(file);
+            };
+
+            input.addEventListener("change", e => { if (e.target.files[0]) readFile(e.target.files[0]); });
+            zone.addEventListener("dragover", e => { e.preventDefault(); zone.classList.add("dragover"); });
+            zone.addEventListener("dragleave", () => zone.classList.remove("dragover"));
+            zone.addEventListener("drop", e => {
+                e.preventDefault(); zone.classList.remove("dragover");
+                if (e.dataTransfer.files[0]) readFile(e.dataTransfer.files[0]);
+            });
+        }
+
+        setupDrop("dropZoneQ", "fileQ", "fileQBadge", (text, name) => {
+            questionsText = text;
+            questionsFilename = name;
+            checkReady();
+        });
+
+        setupDrop("dropZoneC", "fileC", "fileCBadge", (text) => {
+            document.getElementById("condText").value = text;
+            checkReady();
+        });
+
+        document.getElementById("condText").addEventListener("input", checkReady);
+
+        function checkReady() {
+            const condOk = document.getElementById("condText").value.trim().length > 0;
+            document.getElementById("btnRun").disabled = !(questionsText && condOk);
+        }
+
+        let lastRows = [];
+
+        document.getElementById("btnRun").addEventListener("click", () => {
+            setStatus("Parsing conditions…", "info", true);
+            setTimeout(() => {
+                try {
+                    const condText = document.getElementById("condText").value;
+                    const { rows, newConditions } = runParser(questionsText, questionsFilename, condText);
+                    lastRows = rows;
+                    renderResults(rows, newConditions);
+                    setStatus(`Done! ${rows.length} sections processed.`, "success");
+                } catch (err) {
+                    setStatus("Error: " + err.message, "error");
+                    console.error(err);
+                }
+            }, 30);
+        });
+
+        function renderResults(rows, newConditions) {
+            const section = document.getElementById("resultsSection");
+            section.style.display = "flex";
+
+            // Stats
+            const total = rows.length;
+            const alwaysOn = rows.filter(r => r.conditions === ALWAYS_ON).length;
+            const notWorking = rows.filter(r => r.conditions === FALSE_NOT_WORKING).length;
+            const withCond = total - alwaysOn - notWorking;
+            document.getElementById("statsRow").innerHTML = `
+    <div class="stat"><div class="stat-value">${total}</div><div class="stat-label">sections</div></div>
+    <div class="stat"><div class="stat-value" style="color:var(--accent2)">${withCond}</div><div class="stat-label">with conditions</div></div>
+    <div class="stat"><div class="stat-value" style="color:var(--text-dim)">${alwaysOn}</div><div class="stat-label">always on</div></div>
+    <div class="stat"><div class="stat-value" style="color:var(--danger)">${notWorking}</div><div class="stat-label">not working</div></div>
+  `;
+
+            // New conditions
+            const newCard = document.getElementById("newCondCard");
+            if (newConditions.length > 0) {
+                newCard.style.display = "";
+                document.getElementById("newCondList").innerHTML = newConditions
+                    .map(c => `<span class="new-cond-tag">${esc(c)}</span>`).join("");
+            } else {
+                newCard.style.display = "none";
+            }
+
+            // Table
+            const tbody = document.getElementById("resultsBody");
+            tbody.innerHTML = rows.map(r => `
+    <tr>
+      <td>${esc(r.section)}</td>
+      <td>${esc(r.question)}</td>
+      <td class="${r.conditions === ALWAYS_ON ? 'badge-always' : r.conditions === FALSE_NOT_WORKING ? 'badge-false' : ''}">${esc(r.conditions)}</td>
+    </tr>
+  `).join("");
+
+            section.scrollIntoView({ behavior: "smooth" });
+        }
+
+        function esc(s) {
+            return String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        // ─── EXPORT JSON ───
+        document.getElementById("btnDlJSON").addEventListener("click", () => {
+            const blob = new Blob([JSON.stringify(lastRows, null, 2)], { type: "application/json" });
+            dl(blob, "reporte-condiciones.json");
+        });
+
+        // ─── EXPORT XLSX ───
+        document.getElementById("btnDlXLSX").addEventListener("click", () => {
+            const ws_data = [
+                ["section", "question", "conditions"],
+                ...lastRows.map(r => [r.section, r.question, r.conditions])
+            ];
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(ws_data);
+
+            // Column widths
+            ws["!cols"] = [{ wch: 28 }, { wch: 55 }, { wch: 50 }];
+
+            XLSX.utils.book_append_sheet(wb, ws, "Conditions Report");
+            XLSX.writeFile(wb, "reporte-condiciones.xlsx");
+        });
+
+        function dl(blob, name) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url; a.download = name; a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+
+</html>
