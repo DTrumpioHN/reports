@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Condition Parser</title>
+    <title>QuestionSet Report</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap');
@@ -14,8 +14,8 @@
             --surface: #16161a;
             --surface2: #1e1e24;
             --border: #2a2a35;
-            --accent: #7c6af7;
-            --accent2: #4ecdc4;
+            --accent: #002f68;
+            --accent2: #002f68;
             --danger: #ff6b6b;
             --warn: #ffd166;
             --text: #e8e8f0;
@@ -53,14 +53,18 @@
         }
 
         .logo-icon {
-            width: 38px;
+            width: 170px;
             height: 38px;
-            background: var(--accent);
-            border-radius: 8px;
-            display: grid;
-            place-items: center;
-            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
             flex-shrink: 0;
+        }
+
+        .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
         header h1 {
@@ -138,7 +142,7 @@
         .drop-zone:hover,
         .drop-zone.dragover {
             border-color: var(--accent);
-            background: rgba(124, 106, 247, 0.06);
+            background: rgba(0, 47, 104, 0.08);
         }
 
         .drop-zone input[type="file"] {
@@ -168,8 +172,8 @@
             display: inline-flex;
             align-items: center;
             gap: 0.4rem;
-            background: rgba(78, 205, 196, 0.12);
-            border: 1px solid rgba(78, 205, 196, 0.3);
+            background: rgba(0, 47, 104, 0.12);
+            border: 1px solid rgba(0, 47, 104, 0.3);
             color: var(--accent2);
             border-radius: 6px;
             padding: 0.3rem 0.7rem;
@@ -224,13 +228,13 @@
         .btn-primary {
             background: var(--accent);
             color: #fff;
-            box-shadow: 0 0 0 0 rgba(124, 106, 247, 0.5);
+            box-shadow: 0 0 0 0 rgba(0, 47, 104, 0.5);
         }
 
         .btn-primary:hover {
-            background: #6a59e0;
+            background: #013a80;
             transform: translateY(-1px);
-            box-shadow: 0 4px 20px rgba(124, 106, 247, 0.35);
+            box-shadow: 0 4px 20px rgba(0, 47, 104, 0.35);
         }
 
         .btn-primary:active {
@@ -283,14 +287,14 @@
         }
 
         .status-bar.info {
-            background: rgba(124, 106, 247, 0.1);
-            border: 1px solid rgba(124, 106, 247, 0.25);
+            background: rgba(0, 47, 104, 0.1);
+            border: 1px solid rgba(0, 47, 104, 0.25);
             color: var(--accent);
         }
 
         .status-bar.success {
-            background: rgba(78, 205, 196, 0.1);
-            border: 1px solid rgba(78, 205, 196, 0.25);
+            background: rgba(0, 47, 104, 0.1);
+            border: 1px solid rgba(0, 47, 104, 0.25);
             color: var(--accent2);
         }
 
@@ -435,7 +439,7 @@
         .spinner {
             width: 14px;
             height: 14px;
-            border: 2px solid rgba(124, 106, 247, 0.3);
+            border: 2px solid rgba(0, 47, 104, 0.3);
             border-top-color: var(--accent);
             border-radius: 50%;
             animation: spin 0.7s linear infinite;
@@ -462,9 +466,9 @@
 <body>
 
     <header>
-        <div class="logo-icon">⚙</div>
+        <div class="logo-icon"><img src="https://cdn.prod.website-files.com/68f272f770621d6d4e459424/698cbea29ebd824b38d166fc_New%20Logo%20SVG.svg" alt="Logo" /></div>
         <div>
-            <h1>Condition Parser</h1>
+            <h1>QuestionSet Report</h1>
             <p>questionnaire-conditions · parse &amp; export</p>
         </div>
     </header>
@@ -565,7 +569,7 @@
                             <thead>
                                 <tr>
                                     <th>Section</th>
-                                    <th>Question</th>
+                                    <th>Question Count</th>
                                     <th>Conditions</th>
                                 </tr>
                             </thead>
@@ -706,26 +710,22 @@
             }
         }
 
-        function findLastLabel(tokens) {
-            for (let i = tokens.length - 1; i >= 0; i--) {
-                if (tokens[i] !== "AND" && tokens[i] !== "OR") return tokens[i];
-            }
-            return null;
-        }
-
         function conditionColumn(parts) {
             if (parts.length === 0) return ALWAYS_ON;
             const tokens = parts.map(p => p.type === "op" ? p.value : p.label || p.raw).filter(Boolean);
+            const seenLabels = new Set();
             const deduped = [];
             for (let i = 0; i < tokens.length; i++) {
                 const t = tokens[i];
                 const isOp = t === "AND" || t === "OR";
                 if (isOp) { deduped.push(t); }
                 else {
-                    const lastLabel = deduped.length > 0 ? findLastLabel(deduped) : null;
-                    if (lastLabel === t) {
+                    if (seenLabels.has(t)) {
                         if (deduped.at(-1) === "AND" || deduped.at(-1) === "OR") deduped.pop();
-                    } else { deduped.push(t); }
+                    } else {
+                        seenLabels.add(t);
+                        deduped.push(t);
+                    }
                 }
             }
             return deduped.join(" ").trim() || ALWAYS_ON;
@@ -806,12 +806,10 @@
                     if (currentConditions !== ALWAYS_ON) { chosenQuestion = q; chosenConditions = currentConditions; break; }
                 }
 
-                const question = chosenQuestion ?? fallbackQuestion ?? sectionQuestions[0];
-                const questionText = (question?.question ?? "").trim();
                 const conditions = hasNonFalse
                     ? (chosenQuestion ? chosenConditions : fallbackConditions)
                     : FALSE_NOT_WORKING;
-                rows.push({ section, question: questionText, conditions });
+                rows.push({ section, questionCount: sectionQuestions.length, conditions });
             }
 
             return { rows, newConditions: [...newConditions] };
@@ -920,7 +918,7 @@
             tbody.innerHTML = rows.map(r => `
     <tr>
       <td>${esc(r.section)}</td>
-      <td>${esc(r.question)}</td>
+      <td>${esc(r.questionCount)}</td>
       <td class="${r.conditions === ALWAYS_ON ? 'badge-always' : r.conditions === FALSE_NOT_WORKING ? 'badge-false' : ''}">${esc(r.conditions)}</td>
     </tr>
   `).join("");
@@ -941,8 +939,8 @@
         // ─── EXPORT XLSX ───
         document.getElementById("btnDlXLSX").addEventListener("click", () => {
             const ws_data = [
-                ["section", "question", "conditions"],
-                ...lastRows.map(r => [r.section, r.question, r.conditions])
+                ["section", "questionCount", "conditions"],
+                ...lastRows.map(r => [r.section, r.questionCount, r.conditions])
             ];
             const wb = XLSX.utils.book_new();
             const ws = XLSX.utils.aoa_to_sheet(ws_data);
@@ -950,7 +948,7 @@
             // Column widths
             ws["!cols"] = [{ wch: 28 }, { wch: 55 }, { wch: 50 }];
 
-            XLSX.utils.book_append_sheet(wb, ws, "Conditions Report");
+            XLSX.utils.book_append_sheet(wb, ws, "QuestionSet Report");
             XLSX.writeFile(wb, "reporte-condiciones.xlsx");
         });
 

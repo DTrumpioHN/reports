@@ -141,3 +141,4 @@ New: this['shouldAskNew']===true
 If haven't prior experience ADHD: (this['adhd-before-yesno'] OR '').toLowerCase().indexOf('no') > -1
 If is a current smoker: (this['smoke-status'] OR '').toLowerCase().indexOf('current') > -1: (this['smoke-status'] OR '').toLowerCase().indexOf('current') > -1
 Every 365: ( parseInt((this['appointment'] OR '')) - parseInt((this['link'].lastSession['status-session'] OR {})['questionnaireDateYearEpoch'] OR '')) > 31536000000
+

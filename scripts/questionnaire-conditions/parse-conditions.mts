@@ -3,7 +3,7 @@
  * Script: parse-conditions.mts
  *
  * Lee preguntas desde JSON o TSV, parsea las condiciones (&& / ||) y las
- * traduce usando condiciones-logicas.tsv. Genera un JSON con section, question
+ * traduce usando condiciones-logicas.tsv. Genera un JSON con section, questionCount
  * y condition (partes + etiquetas) listo para convertir en columnas.
  *
  * Uso:
@@ -27,10 +27,10 @@ type QuestionInput = {
 	[key: string]: unknown;
 };
 type ConditionPart = { type: "condition"; raw: string; label: string } | { type: "op"; value: "AND" | "OR" };
-/** Fila para Excel: columna 1 = section, columna 2 = question, columna 3 = conditions */
+/** Fila para Excel: columna 1 = section, columna 2 = questionCount, columna 3 = conditions */
 type ExcelRow = {
 	section: string;
-	question: string;
+	questionCount: number;
 	conditions: string;
 };
 
@@ -283,30 +283,24 @@ function conditionColumn(parts: ConditionPart[]): string {
 	const tokens = parts
 		.map((p) => (p.type === "op" ? p.value : p.label || p.raw))
 		.filter(Boolean);
-	// Quitar etiquetas duplicadas: si la siguiente etiqueta es igual a la última, no añadir op ni etiqueta
+	// Quitar etiquetas duplicadas dentro de la sección (aunque reaparezcan más adelante)
 	const deduped: string[] = [];
+	const seenLabels = new Set<string>();
 	for (let i = 0; i < tokens.length; i++) {
 		const t = tokens[i];
 		const isOp = t === "AND" || t === "OR";
 		if (isOp) {
 			deduped.push(t);
 		} else {
-			const lastLabel = deduped.length > 0 ? findLastLabel(deduped) : null;
-			if (lastLabel === t) {
+			if (seenLabels.has(t)) {
 				if (deduped.at(-1) === "AND" || deduped.at(-1) === "OR") deduped.pop();
 			} else {
+				seenLabels.add(t);
 				deduped.push(t);
 			}
 		}
 	}
 	return deduped.join(" ").trim() || ALWAYS_ON;
-}
-
-function findLastLabel(tokens: string[]): string | null {
-	for (let i = tokens.length - 1; i >= 0; i--) {
-		if (tokens[i] !== "AND" && tokens[i] !== "OR") return tokens[i];
-	}
-	return null;
 }
 
 function loadQuestions(inputPath: string): QuestionInput[] {
@@ -410,20 +404,18 @@ function main(): void {
 			}
 		}
 
-		const question = chosenQuestion ?? fallbackQuestion ?? sectionQuestions[0];
-		const questionText = (question?.question ?? "").trim();
 		const conditions = hasNonFalse
 			? (chosenQuestion ? chosenConditions : fallbackConditions)
 			: FALSE_NOT_WORKING;
 		excelRows.push({
 			section,
-			question: questionText,
+			questionCount: sectionQuestions.length,
 			conditions,
 		});
 	}
 
 	appendNewConditions(ROOT, newConditions);
-	// Guardar JSON listo para Excel: fila 1 = headers (section, question, conditions), fila 2+ = datos
+	// Guardar JSON listo para Excel: fila 1 = headers (section, questionCount, conditions), fila 2+ = datos
 	const reportPath = resolve(ROOT, REPORTE_FILE);
 	writeFileSync(reportPath, JSON.stringify(excelRows, null, 2) + "\n", "utf-8");
 	console.log(`Reporte generado en: ${reportPath}`);
