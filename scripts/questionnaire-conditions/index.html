@@ -10,15 +10,15 @@
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap');
 
         :root {
-            --bg: #0d0d0f;
-            --surface: #16161a;
-            --surface2: #1e1e24;
-            --border: #2a2a35;
+            --bg: #ffffff;
+            --surface: #ffffff;
+            --surface2: #f7f7f9;
+            --border: #d9d9e0;
             --accent: #002f68;
             --accent2: #002f68;
             --danger: #ff6b6b;
             --warn: #ffd166;
-            --text: #e8e8f0;
+            --text: #111111;
             --text-dim: #7a7a8c;
             --text-muted: #44444f;
             --mono: 'JetBrains Mono', monospace;
@@ -412,23 +412,6 @@
             background: var(--border);
         }
 
-        /* NEW CONDITIONS */
-        .new-cond-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.4rem;
-        }
-
-        .new-cond-tag {
-            background: rgba(255, 209, 102, 0.08);
-            border: 1px solid rgba(255, 209, 102, 0.2);
-            color: var(--warn);
-            border-radius: 5px;
-            padding: 0.25rem 0.55rem;
-            font-size: 0.72rem;
-            font-family: var(--mono);
-        }
-
         /* SPINNER */
         @keyframes spin {
             to {
@@ -537,19 +520,6 @@
         <div id="resultsSection" style="display:none;flex-direction:column;gap:1.5rem;">
 
             <div class="stats-row" id="statsRow"></div>
-
-            <!-- New conditions warning -->
-            <div id="newCondCard" class="card" style="display:none;">
-                <div class="card-header">
-                    <span style="font-size:1rem;">⚠️</span>
-                    <h2 style="color:var(--warn);">Unrecognized conditions</h2>
-                </div>
-                <div class="card-body">
-                    <p style="font-size:0.8rem;color:var(--text-dim);margin-bottom:0.75rem;">These conditions weren't
-                        found in the map and were left as-is. Add them to your TSV for future runs.</p>
-                    <div class="new-cond-list" id="newCondList"></div>
-                </div>
-            </div>
 
             <!-- Table -->
             <div class="card">
@@ -812,7 +782,7 @@
                 rows.push({ section, questionCount: sectionQuestions.length, conditions });
             }
 
-            return { rows, newConditions: [...newConditions] };
+            return { rows };
         }
 
         // ─────────────────────────────────────────────
@@ -876,9 +846,9 @@
             setTimeout(() => {
                 try {
                     const condText = document.getElementById("condText").value;
-                    const { rows, newConditions } = runParser(questionsText, questionsFilename, condText);
+                    const { rows } = runParser(questionsText, questionsFilename, condText);
                     lastRows = rows;
-                    renderResults(rows, newConditions);
+                    renderResults(rows);
                     setStatus(`Done! ${rows.length} sections processed.`, "success");
                 } catch (err) {
                     setStatus("Error: " + err.message, "error");
@@ -887,7 +857,7 @@
             }, 30);
         });
 
-        function renderResults(rows, newConditions) {
+        function renderResults(rows) {
             const section = document.getElementById("resultsSection");
             section.style.display = "flex";
 
@@ -902,16 +872,6 @@
     <div class="stat"><div class="stat-value" style="color:var(--text-dim)">${alwaysOn}</div><div class="stat-label">always on</div></div>
     <div class="stat"><div class="stat-value" style="color:var(--danger)">${notWorking}</div><div class="stat-label">not working</div></div>
   `;
-
-            // New conditions
-            const newCard = document.getElementById("newCondCard");
-            if (newConditions.length > 0) {
-                newCard.style.display = "";
-                document.getElementById("newCondList").innerHTML = newConditions
-                    .map(c => `<span class="new-cond-tag">${esc(c)}</span>`).join("");
-            } else {
-                newCard.style.display = "none";
-            }
 
             // Table
             const tbody = document.getElementById("resultsBody");
