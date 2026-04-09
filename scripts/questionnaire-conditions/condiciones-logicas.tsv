@@ -1,4 +1,3 @@
-<18 Years old: this['age'] < 18
 If should ask ROI: this['consent-disclosure']
 Doesn't have Yearly review: !this['yearly-review']
 If should ask Privacy: this['privacy']=='yes'
@@ -82,15 +81,39 @@ If should not ask registration ot limited: !(this['shouldAskRegistration'] || th
 3+ Years old: (this['age'] ?( this['age'] >= 03 && this['age'] <= 1000) : false)
 1+ Years old: (this['age'] ?( this['age'] >= 1 && this['age'] <= 1000) : false)
 <1 years old: this['age'] <= 1
+<1 years old: this['age'] < 1
 <2 years old: this['age'] < 2
->9 years old: this['age'] >= 9
->11 years old: this['age'] >= 11
->11 years old: this['age'] > 11
+<2 years old: this['age'] <= 2
+2+ years old: this['age'] > 2
+2+ years old: this['age'] >= 2
+<7 years old: this['age'] <= 7
+<7 years old: this['age'] < 7
+7+ years old: this['age'] >= 7
+7+ years old: this['age'] > 7
+7 years old: this['age'] == 7
+<8 years old: this['age'] <= 8
+<8 years old: this['age'] < 8
+8+ years old: this['age'] >= 8
+8+ years old: this['age'] > 8
+8 years old: this['age'] == 8
+9+ years old: this['age'] >= 9
+9+ years old: this['age'] > 9
+<9 years old: this['age'] <= 9
+<9 years old: this['age'] < 9
+9 years old: this['age'] == 9
+11+ years old: this['age'] >= 11
+11+ years old: this['age'] > 11
 <18 Years old: this['age'] < 18
 <18 Years old: this['age'] <= 18
+18+ Years old: this['age'] > 18
+18+ Years old: this['age'] >= 18
+18 years old: this['age'] == 18
 <17 years old: this['age'] <= 17
 <17 years old: this['age'] < 17
->65 years old: this['age'] >= 65
+17+ years old: this['age'] >= 17
+17+ years old: this['age'] > 17
+17 years old: this['age'] == 17
+65+ years old: this['age'] >= 65
 If should ask ROI: this['consent-disclosure']
 Doesn't have Yearly review: !this['yearly-review']
 If should ask School Based : this['shouldAskSchoolBased']
@@ -120,17 +143,34 @@ newborn: (this['age-under2'] || '').toLowerCase().indexOf('newborn') > -1
 12-14 months old: (this['age-under2'] || '').toLowerCase().indexOf('12-14 months') > -1
 3 years old: (this['age-under3'] || '').toLowerCase().indexOf('3 years') > -1
 3 years old: this['age'] == 3
+2 years old: this['age'] == 2
 4 years old: this['age'] == 4
 4-11 years old: this['age'] >= 4 AND this['age'] <= 11
 7-8 months old: (this['age-under2'] || '').toLowerCase().indexOf('7-8 months') > -1
->1 years old: this['age'] >= 1
+1+years old: this['age'] >= 1
+1+years old: this['age'] > 1
 <5 years old: this['age'] <= 5
->3 years old: this['age'] >= 3
+<5 years old: this['age'] < 5
+5+ years old: this['age'] > 5
+5+ years old: this['age'] >= 5
+5 years old: this['age'] == 5
+3+ years old: this['age'] >= 3
+3+ years old: this['age'] > 3
+<3 years old: this['age'] <= 3
+<3 years old: this['age'] < 3
 <11 years old: this['age'] <= 11
+<11 years old: this['age'] < 11
 present anxiety: (this['visit-reason-bh'] || '').toLowerCase().indexOf('anxiety') > -1
 present depression: (this['visit-reason-bh'] || '').toLowerCase().indexOf('depression') > -1
-> 6 years old: this['age'] >= 6
-> 4 years old: this['age'] >= 4
+6+ years old: this['age'] >= 6
+6+ years old: this['age'] > 6
+< 6 years old: this['age'] < 6
+< 6 years old: this['age'] <= 6
+6 years old: this['age'] == 6
+4+ years old: this['age'] >= 4
+4+ years old: this['age'] > 4
+< 4 years old: this['age'] < 4
+< 4 years old: this['age'] <= 4
 If should ask Past Surgery: this['askPastSurgery'] == 'yes'
 conservatorship is guardian: (this['conservatorship'] || '').toLowerCase().indexOf('guardian') > -1
 conservatorship is guarantor: (this['conservatorship'] || '').toLowerCase().indexOf('guarantor') > -1
